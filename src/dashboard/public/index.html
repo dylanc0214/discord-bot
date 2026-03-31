@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Only-NONE Bot Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css" rel="stylesheet">
+    <style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status-online { color: #10b981; }
+        .status-idle { color: #f59e0b; }
+        .status-dnd { color: #ef4444; }
+        .status-offline { color: #6b7280; }
+        
+        .rarity-common { color: #ffffff; }
+        .rarity-uncommon { color: #1eff00; }
+        .rarity-rare { color: #0070dd; }
+        .rarity-epic { color: #a335ee; }
+        .rarity-legendary { color: #ff8000; }
+        .rarity-mythic { color: #e6cc80; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- Navigation -->
+    <nav class="glass-effect sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-white text-xl font-bold">
+                            <i class="fas fa-robot mr-2"></i>Only-NONE Dashboard
+                        </h1>
+                    </div>
+                    <div class="hidden sm:block sm:ml-6">
+                        <div class="flex space-x-4">
+                            <a href="#overview" class="nav-link text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Overview</a>
+                            <a href="#members" class="nav-link text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Members</a>
+                            <a href="#economy" class="nav-link text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Economy</a>
+                            <a href="#moderation" class="nav-link text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Moderation</a>
+                            <a href="#settings" class="nav-link text-white hover:text-gray-300 px-3 py-2 rounded-md text-sm font-medium">Settings</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="connection-status" class="text-white">
+                        <i class="fas fa-circle text-green-400 pulse"></i> Connected
+                    </div>
+                    <div id="user-info" class="text-white">
+                        <img id="user-avatar" src="" alt="User" class="w-8 h-8 rounded-full">
+                        <span id="user-name" class="ml-2"></span>
+                    </div>
+                    <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Guild Selector -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="glass-effect rounded-lg p-4">
+            <label class="text-white text-sm font-medium mb-2 block">Select Server:</label>
+            <select id="guild-selector" class="w-full bg-white bg-opacity-20 text-white border border-white border-opacity-30 rounded-md px-3 py-2">
+                <option value="">Loading servers...</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Overview Section -->
+        <section id="overview" class="section">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Server Info Card -->
+                <div class="glass-effect rounded-lg p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-server text-3xl text-white"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-white text-lg font-medium">Server Info</h3>
+                            <p id="server-name" class="text-gray-300 text-sm">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Members Card -->
+                <div class="glass-effect rounded-lg p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-users text-3xl text-white"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-white text-lg font-medium">Members</h3>
+                            <p id="member-count" class="text-gray-300 text-sm">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Economy Card -->
+                <div class="glass-effect rounded-lg p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-coins text-3xl text-white"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-white text-lg font-medium">Economy</h3>
+                            <p id="economy-total" class="text-gray-300 text-sm">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Moderation Card -->
+                <div class="glass-effect rounded-lg p-6 card-hover">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-gavel text-3xl text-white"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-white text-lg font-medium">Moderation</h3>
+                            <p id="moderation-cases" class="text-gray-300 text-sm">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Member Activity Chart -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-white text-lg font-medium mb-4">Member Activity</h3>
+                    <canvas id="activity-chart"></canvas>
+                </div>
+
+                <!-- Economy Chart -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-white text-lg font-medium mb-4">Economy Overview</h3>
+                    <canvas id="economy-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Members Section -->
+        <section id="members" class="section hidden">
+            <div class="glass-effect rounded-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-white text-2xl font-bold">Server Members</h2>
+                    <div class="flex space-x-4">
+                        <input type="text" id="member-search" placeholder="Search members..." 
+                               class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 rounded-md px-3 py-2">
+                        <select id="member-filter" class="bg-white bg-opacity-20 text-white border border-white border-opacity-30 rounded-md px-3 py-2">
+                            <option value="all">All Members</option>
+                            <option value="online">Online</option>
+                            <option value="bots">Bots</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-white">
+                        <thead>
+                            <tr class="border-b border-white border-opacity-20">
+                                <th class="text-left py-3 px-4">User</th>
+                                <th class="text-left py-3 px-4">Status</th>
+                                <th class="text-left py-3 px-4">Joined</th>
+                                <th class="text-left py-3 px-4">Roles</th>
+                                <th class="text-left py-3 px-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="members-table">
+                            <tr>
+                                <td colspan="5" class="text-center py-8">Loading members...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="members-pagination" class="flex justify-center mt-6 space-x-2">
+                    <!-- Pagination buttons will be added here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Economy Section -->
+        <section id="economy" class="section hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Economy Stats -->
+                <div class="lg:col-span-2">
+                    <div class="glass-effect rounded-lg p-6 mb-6">
+                        <h2 class="text-white text-2xl font-bold mb-4">Economy Statistics</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-white" id="total-users">0</p>
+                                <p class="text-gray-300">Total Users</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-white" id="total-balance">0</p>
+                                <p class="text-gray-300">Total Balance</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-white" id="avg-balance">0</p>
+                                <p class="text-gray-300">Average Balance</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-white" id="total-transactions">0</p>
+                                <p class="text-gray-300">Transactions</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leaderboard -->
+                    <div class="glass-effect rounded-lg p-6">
+                        <h3 class="text-white text-xl font-bold mb-4">Top Richest Users</h3>
+                        <div id="leaderboard" class="space-y-3">
+                            <!-- Leaderboard items will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shop Management -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-white text-xl font-bold mb-4">Shop Management</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-white">Total Items</span>
+                            <span class="text-white font-bold" id="shop-total-items">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-white">In Stock</span>
+                            <span class="text-white font-bold" id="shop-in-stock">0</span>
+                        </div>
+                        <button class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md">
+                            <i class="fas fa-plus mr-2"></i>Add Item
+                        </button>
+                        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md">
+                            <i class="fas fa-chart-line mr-2"></i>View Analytics
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Moderation Section -->
+        <section id="moderation" class="section hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Moderation Stats -->
+                <div class="lg:col-span-2">
+                    <div class="glass-effect rounded-lg p-6 mb-6">
+                        <h2 class="text-white text-2xl font-bold mb-4">Moderation Overview</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-white" id="mod-total-cases">0</p>
+                                <p class="text-gray-300">Total Cases</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-white" id="mod-warnings">0</p>
+                                <p class="text-gray-300">Warnings</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-white" id="mod-kicks">0</p>
+                                <p class="text-gray-300">Kicks</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-white" id="mod-bans">0</p>
+                                <p class="text-gray-300">Bans</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Cases -->
+                    <div class="glass-effect rounded-lg p-6">
+                        <h3 class="text-white text-xl font-bold mb-4">Recent Cases</h3>
+                        <div id="recent-cases" class="space-y-3">
+                            <!-- Recent cases will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auto-Mod Settings -->
+                <div class="glass-effect rounded-lg p-6">
+                    <h3 class="text-white text-xl font-bold mb-4">Auto-Moderation</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-white">Auto-Mod Status</span>
+                            <span class="text-white font-bold" id="automod-status">Disabled</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-white">Active Rules</span>
+                            <span class="text-white font-bold" id="active-rules">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-white">Logging</span>
+                            <span class="text-white font-bold" id="logging-status">Disabled</span>
+                        </div>
+                        <button class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md">
+                            <i class="fas fa-plus mr-2"></i>Add Rule
+                        </button>
+                        <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-md">
+                            <i class="fas fa-cog mr-2"></i>Configure
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="glass-effect rounded-lg p-8">
+            <div class="text-center">
+                <i class="fas fa-spinner fa-spin text-4xl text-white mb-4"></i>
+                <p class="text-white">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.5.0/dist/socket.io.min.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

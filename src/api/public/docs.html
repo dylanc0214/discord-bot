@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Only-NONE Bot API Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .method-get { color: #10b981; }
+        .method-post { color: #3b82f6; }
+        .method-put { color: #f59e0b; }
+        .method-delete { color: #ef4444; }
+        .endpoint-path { color: #8b5cf6; font-weight: 600; }
+        .required { color: #ef4444; font-weight: 600; }
+        .optional { color: #6b7280; }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-white mb-4">
+                <i class="fas fa-robot mr-3"></i>Only-NONE Bot API
+            </h1>
+            <p class="text-xl text-gray-200">RESTful API for Discord bot integrations</p>
+            <div class="mt-4">
+                <span class="inline-block bg-green-500 text-white px-4 py-2 rounded-full text-sm">
+                    <i class="fas fa-circle text-green-300 mr-2"></i>API v1.0.0
+                </span>
+            </div>
+        </header>
+
+        <!-- Authentication -->
+        <section class="glass-effect rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4">
+                <i class="fas fa-key mr-2"></i>Authentication
+            </h2>
+            <div class="text-gray-200">
+                <p class="mb-4">All API endpoints require authentication using an API key. You can generate API keys using the <code class="code-block">/api create</code> command in Discord.</p>
+                
+                <h3 class="text-lg font-semibold text-white mb-2">How to Use API Keys:</h3>
+                <div class="code-block mb-4">
+                    <div class="text-green-400"># Using Header (Recommended)</div>
+                    curl -H "X-API-Key: your-api-key-here" \
+                         https://your-bot-url.com/api/v1/info
+
+                    <div class="text-green-400 mt-4"># Using Query Parameter</div>
+                    curl "https://your-bot-url.com/api/v1/info?api_key=your-api-key-here"
+                </div>
+
+                <h3 class="text-lg font-semibold text-white mb-2">Key Permissions:</h3>
+                <ul class="list-disc list-inside space-y-1">
+                    <li><code class="text-green-400">read</code> - Read access to basic information</li>
+                    <li><code class="text-blue-400">write</code> - Modify data (where applicable)</li>
+                    <li><code class="text-yellow-400">economy</code> - Access economy endpoints</li>
+                    <li><code class="text-red-400">moderation</code> - Access moderation endpoints</li>
+                    <li><code class="text-purple-400">admin</code> - Full administrative access</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Base URL -->
+        <section class="glass-effect rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4">
+                <i class="fas fa-link mr-2"></i>Base URL
+            </h2>
+            <div class="code-block">
+                https://your-bot-url.com/api/v1
+            </div>
+        </section>
+
+        <!-- Endpoints -->
+        <section class="glass-effect rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-white mb-6">
+                <i class="fas fa-plug mr-2"></i>API Endpoints
+            </h2>
+
+            <!-- Health Check -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-get">GET</span> <span class="endpoint-path">/health</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Check API health status</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Response:</div>
+                    <div class="code-block">
+{
+  "status": "healthy",
+  "version": "v1",
+  "timestamp": "2023-12-01T12:00:00.000Z",
+  "uptime": 3600
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Info -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-get">GET</span> <span class="endpoint-path">/info</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Get API and key information</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Response:</div>
+                    <div class="code-block">
+{
+  "api": {
+    "version": "v1",
+    "name": "Only-NONE Bot API",
+    "description": "REST API for Only-NONE Discord bot",
+    "documentation": "https://your-bot-url.com/api/v1/docs"
+  },
+  "key": {
+    "id": "key_id",
+    "name": "My API Key",
+    "permissions": ["read", "economy"],
+    "rateLimit": 60,
+    "usage": {
+      "requests": 150,
+      "lastUsed": "2023-12-01T11:30:00.000Z"
+    }
+  }
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Info -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-get">GET</span> <span class="endpoint-path">/users/{userId}</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Get user information and guild memberships</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Parameters:</div>
+                    <ul class="text-gray-200 mb-3">
+                        <li><span class="required">userId</span> (string, path) - Discord user ID</li>
+                    </ul>
+                    <div class="text-sm text-gray-300 mb-2">Response:</div>
+                    <div class="code-block">
+{
+  "user": {
+    "id": "123456789",
+    "username": "username",
+    "discriminator": "1234",
+    "avatar": "https://cdn.discordapp.com/avatars/...",
+    "bot": false,
+    "createdAt": "2020-01-01T00:00:00.000Z"
+  },
+  "guilds": [
+    {
+      "id": "987654321",
+      "name": "Server Name",
+      "icon": "https://cdn.discordapp.com/icons/...",
+      "permissions": "2147483647",
+      "joinedAt": "2020-01-01T00:00:00.000Z",
+      "roles": [
+        {
+          "id": "123456789",
+          "name": "Member",
+          "color": 0,
+          "position": 0
+        }
+      ]
+    }
+  ]
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guilds List -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-get">GET</span> <span class="endpoint-path">/guilds</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Get list of guilds (filtered by API key permissions)</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Response:</div>
+                    <div class="code-block">
+{
+  "guilds": [
+    {
+      "id": "987654321",
+      "name": "Server Name",
+      "icon": "https://cdn.discordapp.com/icons/...",
+      "owner": "123456789",
+      "memberCount": 1000,
+      "createdAt": "2020-01-01T00:00:00.000Z",
+      "features": ["COMMUNITY"],
+      "description": "Server description",
+      "banner": "https://cdn.discordapp.com/banners/...",
+      "splash": "https://cdn.discordapp.com/splashes/..."
+    }
+  ],
+  "total": 1
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guild Details -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-get">GET</span> <span class="endpoint-path">/guilds/{guildId}</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Get detailed guild information</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Parameters:</div>
+                    <ul class="text-gray-200 mb-3">
+                        <li><span class="required">guildId</span> (string, path) - Discord guild ID</li>
+                    </ul>
+                    <div class="text-sm text-gray-300 mb-2">Response:</div>
+                    <div class="code-block">
+{
+  "guild": {
+    "id": "987654321",
+    "name": "Server Name",
+    "icon": "https://cdn.discordapp.com/icons/...",
+    "owner": "123456789",
+    "memberCount": 1000,
+    "createdAt": "2020-01-01T00:00:00.000Z",
+    "features": ["COMMUNITY"],
+    "description": "Server description",
+    "banner": "https://cdn.discordapp.com/banners/...",
+    "splash": "https://cdn.discordapp.com/splashes/...",
+    "vanityURL": "custom-url",
+    "verificationLevel": 2,
+    "nsfwLevel": 0,
+    "boostCount": 10,
+    "boostTier": 1
+  },
+  "channels": [...],
+  "roles": [...],
+  "emojis": [...]
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guild Members -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-get">GET</span> <span class="endpoint-path">/guilds/{guildId}/members</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Get guild members with pagination and filtering</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Parameters:</div>
+                    <ul class="text-gray-200 mb-3">
+                        <li><span class="required">guildId</span> (string, path) - Discord guild ID</li>
+                        <li><span class="optional">page</span> (integer, query) - Page number (default: 1)</li>
+                        <li><span class="optional">limit</span> (integer, query) - Results per page (max: 1000)</li>
+                        <li><span class="optional">search</span> (string, query) - Search by username or nickname</li>
+                        <li><span class="optional">filter</span> (string, query) - Filter by bots/humans/online</li>
+                    </ul>
+                    <div class="text-sm text-gray-300 mb-2">Response:</div>
+                    <div class="code-block">
+{
+  "members": [...],
+  "pagination": {
+    "page": 1,
+    "limit": 100,
+    "total": 1000,
+    "pages": 10,
+    "hasNext": true,
+    "hasPrev": false
+  }
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Economy Users -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-get">GET</span> <span class="endpoint-path">/guilds/{guildId}/economy/users</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Get economy users with pagination</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Permissions Required:</div>
+                    <div class="code-block mb-3">economy</div>
+                    <div class="text-sm text-gray-300 mb-2">Parameters:</div>
+                    <ul class="text-gray-200 mb-3">
+                        <li><span class="required">guildId</span> (string, path) - Discord guild ID</li>
+                        <li><span class="optional">page</span> (integer, query) - Page number (default: 1)</li>
+                        <li><span class="optional">limit</span> (integer, query) - Results per page (max: 100)</li>
+                        <li><span class="optional">sort</span> (string, query) - Sort field (balance/totalBalance)</li>
+                        <li><span class="optional">order</span> (string, query) - Sort order (asc/desc)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Economy User -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-get">GET</span> <span class="endpoint-path">/guilds/{guildId}/economy/user/{userId}</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Get specific user economy data</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Permissions Required:</div>
+                    <div class="code-block mb-3">economy</div>
+                    <div class="text-sm text-gray-300 mb-2">Parameters:</div>
+                    <ul class="text-gray-200 mb-3">
+                        <li><span class="required">guildId</span> (string, path) - Discord guild ID</li>
+                        <li><span class="required">userId</span> (string, path) - Discord user ID</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Update Balance -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-post">POST</span> <span class="endpoint-path">/guilds/{guildId}/economy/user/{userId}/balance</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Update user balance</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Permissions Required:</div>
+                    <div class="code-block mb-3">economy</div>
+                    <div class="text-sm text-gray-300 mb-2">Parameters:</div>
+                    <ul class="text-gray-200 mb-3">
+                        <li><span class="required">guildId</span> (string, path) - Discord guild ID</li>
+                        <li><span class="required">userId</span> (string, path) - Discord user ID</li>
+                    </ul>
+                    <div class="text-sm text-gray-300 mb-2">Request Body:</div>
+                    <div class="code-block mb-3">
+{
+  "amount": 1000,
+  "type": "add",
+  "reason": "Bonus payment"
+}
+                    </div>
+                    <div class="text-sm text-gray-300 mb-2">Body Fields:</div>
+                    <ul class="text-gray-200 mb-3">
+                        <li><span class="required">amount</span> (number) - Amount to add/remove</li>
+                        <li><span class="required">type</span> (string) - "add" or "remove"</li>
+                        <li><span class="optional">reason</span> (string) - Reason for the change</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Moderation Cases -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-get">GET</span> <span class="endpoint-path">/guilds/{guildId}/moderation/cases</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Get moderation cases</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Permissions Required:</div>
+                    <div class="code-block mb-3">moderation</div>
+                    <div class="text-sm text-gray-300 mb-2">Parameters:</div>
+                    <ul class="text-gray-200 mb-3">
+                        <li><span class="required">guildId</span> (string, path) - Discord guild ID</li>
+                        <li><span class="optional">page</span> (integer, query) - Page number (default: 1)</li>
+                        <li><span class="optional">limit</span> (integer, query) - Results per page (max: 100)</li>
+                        <li><span class="optional">type</span> (string, query) - Filter by case type</li>
+                        <li><span class="optional">status</span> (string, query) - Filter by case status</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Create Case -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-white mb-3">
+                    <span class="method-post">POST</span> <span class="endpoint-path">/guilds/{guildId}/moderation/cases</span>
+                </h3>
+                <p class="text-gray-200 mb-3">Create a new moderation case</p>
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-300 mb-2">Permissions Required:</div>
+                    <div class="code-block mb-3">moderation</div>
+                    <div class="text-sm text-gray-300 mb-2">Request Body:</div>
+                    <div class="code-block mb-3">
+{
+  "caseType": "WARN",
+  "userID": "123456789",
+  "userTag": "username#1234",
+  "moderatorID": "987654321",
+  "moderatorTag": "moderator#5678",
+  "reason": "Spamming in general chat",
+  "severity": 2,
+  "evidence": ["Screenshot of spam messages"]
+}
+                    </div>
+                    <div class="text-sm text-gray-300 mb-2">Required Fields:</div>
+                    <ul class="text-gray-200 mb-3">
+                        <li><span class="required">caseType</span> (string) - Case type (WARN, KICK, BAN, etc.)</li>
+                        <li><span class="required">userID</span> (string) - Target user ID</li>
+                        <li><span class="required">userTag</span> (string) - Target user tag</li>
+                        <li><span class="required">moderatorID</span> (string) - Moderator user ID</li>
+                        <li><span class="required">moderatorTag</span> (string) - Moderator user tag</li>
+                        <li><span class="required">reason</span> (string) - Case reason</li>
+                    </ul>
+                    <div class="text-sm text-gray-300 mb-2">Optional Fields:</div>
+                    <ul class="text-gray-200 mb-3">
+                        <li><span class="optional">severity</span> (number) - Severity level (1-5)</li>
+                        <li><span class="optional">duration</span> (number) - Duration for temporary actions</li>
+                        <li><span class="optional">evidence</span> (array) - Evidence array</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Error Handling -->
+        <section class="glass-effect rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4">
+                <i class="fas fa-exclamation-triangle mr-2"></i>Error Handling
+            </h2>
+            <div class="text-gray-200">
+                <p class="mb-4">The API returns standard HTTP status codes and JSON error responses:</p>
+                
+                <div class="code-block mb-4">
+{
+  "error": "Error type",
+  "message": "Detailed error message",
+  "details": "Additional error details (if available)"
+}
+                </div>
+
+                <h3 class="text-lg font-semibold text-white mb-2">Common Status Codes:</h3>
+                <ul class="list-disc list-inside space-y-1">
+                    <li><code class="text-green-400">200</code> - Success</li>
+                    <li><code class="text-blue-400">201</code> - Created</li>
+                    <li><code class="text-yellow-400">400</code> - Bad Request</li>
+                    <li><code class="text-yellow-400">401</code> - Unauthorized</li>
+                    <li><code class="text-red-400">403</code> - Forbidden</li>
+                    <li><code class="text-red-400">404</code> - Not Found</li>
+                    <li><code class="text-red-400">429</code> - Rate Limited</li>
+                    <li><code class="text-red-400">500</code> - Internal Server Error</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Rate Limiting -->
+        <section class="glass-effect rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4">
+                <i class="fas fa-tachometer-alt mr-2"></i>Rate Limiting
+            </h2>
+            <div class="text-gray-200">
+                <p class="mb-4">API keys have configurable rate limits:</p>
+                
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Per-minute limit (default: 60 requests)</li>
+                    <li>Per-day limit (default: 10,000 requests)</li>
+                    <li>Rate limit headers included in responses</li>
+                </ul>
+
+                <div class="code-block mt-4">
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 59
+X-RateLimit-Reset: 1638360000
+                </div>
+            </div>
+        </section>
+
+        <!-- Examples -->
+        <section class="glass-effect rounded-lg p-6">
+            <h2 class="text-2xl font-bold text-white mb-4">
+                <i class="fas fa-code mr-2"></i>Code Examples
+            </h2>
+            
+            <div class="space-y-6">
+                <!-- JavaScript Example -->
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-2">JavaScript (Node.js)</h3>
+                    <div class="code-block">
+const axios = require('axios');
+
+const api = axios.create({
+    baseURL: 'https://your-bot-url.com/api/v1',
+    headers: {
+        'X-API-Key': 'your-api-key-here'
+    }
+});
+
+// Get guild information
+async function getGuildInfo(guildId) {
+    try {
+        const response = await api.get(`/guilds/${guildId}`);
+        console.log(response.data);
+    } catch (error) {
+        console.error('Error:', error.response.data);
+    }
+}
+
+// Update user balance
+async function updateBalance(guildId, userId, amount, type, reason) {
+    try {
+        const response = await api.post(`/guilds/${guildId}/economy/user/${userId}/balance`, {
+            amount,
+            type,
+            reason
+        });
+        console.log('Balance updated:', response.data);
+    } catch (error) {
+        console.error('Error:', error.response.data);
+    }
+}
+                    </div>
+                </div>
+
+                <!-- Python Example -->
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Python</h3>
+                    <div class="code-block">
+import requests
+
+class BotAPI:
+    def __init__(self, base_url, api_key):
+        self.base_url = base_url
+        self.headers = {'X-API-Key': api_key}
+    
+    def get_guild_info(self, guild_id):
+        response = requests.get(
+            f'{self.base_url}/guilds/{guild_id}',
+            headers=self.headers
+        )
+        return response.json()
+    
+    def update_balance(self, guild_id, user_id, amount, type_, reason=None):
+        data = {
+            'amount': amount,
+            'type': type_
+        }
+        if reason:
+            data['reason'] = reason
+        
+        response = requests.post(
+            f'{self.base_url}/guilds/{guild_id}/economy/user/{user_id}/balance',
+            json=data,
+            headers=self.headers
+        )
+        return response.json()
+
+# Usage
+api = BotAPI('https://your-bot-url.com/api/v1', 'your-api-key')
+guild_info = api.get_guild_info('123456789')
+print(guild_info)
+                    </div>
+                </div>
+
+                <!-- cURL Example -->
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-2">cURL</h3>
+                    <div class="code-block">
+# Get guild information
+curl -H "X-API-Key: your-api-key-here" \
+     https://your-bot-url.com/api/v1/guilds/123456789
+
+# Update user balance
+curl -X POST \
+     -H "X-API-Key: your-api-key-here" \
+     -H "Content-Type: application/json" \
+     -d '{"amount": 1000, "type": "add", "reason": "Bonus payment"}' \
+     https://your-bot-url.com/api/v1/guilds/123456789/economy/user/987654321/balance
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Add interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Copy code blocks to clipboard
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach(block => {
+                block.style.position = 'relative';
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.className = 'absolute top-2 right-2 bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-xs';
+                copyBtn.style.opacity = '0';
+                block.appendChild(copyBtn);
+                
+                block.addEventListener('mouseenter', () => {
+                    copyBtn.style.opacity = '1';
+                });
+                
+                block.addEventListener('mouseleave', () => {
+                    copyBtn.style.opacity = '0';
+                });
+                
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(block.textContent.trim());
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
