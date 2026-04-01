@@ -1,9 +1,8 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    openTicket: String,
-    dmMessage: String
-});
-
-module.exports = mongoose.model("ticketMessage", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('TicketMessage', {
+    Guild: { type: DataTypes.STRING(32) },
+    Message: { type: DataTypes.TEXT },
+    Channel: { type: DataTypes.STRING(32) },
+}, { tableName: 'ticket_message' });
+addMongooseCompat(Model);
+module.exports = Model;

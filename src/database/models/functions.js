@@ -1,16 +1,15 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    Levels: { type: Boolean, default: false },
-    Beta: { type: Boolean, default: false },
-    AntiAlt: { type: Boolean, default: false },
-    AntiSpam: { type: Boolean, default: false },
-    AntiCaps: { type: Boolean, default: false },
-    AntiInvite: { type: Boolean, default: false },
-    AntiLinks: { type: Boolean, default: false },
-    Prefix: String,
-    Color: String 
-});
-
-module.exports = mongoose.model("functions", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('Functions', {
+    Guild: { type: DataTypes.STRING(32) },
+    Levels: { type: DataTypes.BOOLEAN, defaultValue: false },
+    Beta: { type: DataTypes.BOOLEAN, defaultValue: false },
+    AntiAlt: { type: DataTypes.BOOLEAN, defaultValue: false },
+    AntiSpam: { type: DataTypes.BOOLEAN, defaultValue: false },
+    AntiCaps: { type: DataTypes.BOOLEAN, defaultValue: false },
+    AntiInvite: { type: DataTypes.BOOLEAN, defaultValue: false },
+    AntiLinks: { type: DataTypes.BOOLEAN, defaultValue: false },
+    Prefix: { type: DataTypes.STRING(10) },
+    Color: { type: DataTypes.STRING(20) },
+}, { tableName: 'functions' });
+addMongooseCompat(Model);
+module.exports = Model;

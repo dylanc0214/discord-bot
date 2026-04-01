@@ -96,8 +96,7 @@ module.exports = {
         let startButton = new ButtonBuilder().setStyle(2).setEmoji(`⏮️`).setCustomId('start'),
             backButton = new ButtonBuilder().setStyle(2).setEmoji(`⬅️`).setCustomId('back'),
             forwardButton = new ButtonBuilder().setStyle(2).setEmoji(`➡️`).setCustomId('forward'),
-            endButton = new ButtonBuilder().setStyle(2).setEmoji(`⏭️`).setCustomId('end'),
-            link = new ButtonBuilder().setStyle(5).setLabel("S" + "u" + "b" + "sc" + "ri" + "b" + "e" + "!").setEmoji(`🥹`).setURL('https://rebrand.ly/uo-dev')
+            endButton = new ButtonBuilder().setStyle(2).setEmoji(`⏭️`).setCustomId('end')
 
         const options = [{ label: 'Owerview', value: '0' }]
         const options2 = []
@@ -124,7 +123,7 @@ module.exports = {
         let menu = new StringSelectMenuBuilder().setPlaceholder('Change page').setCustomId('pagMenu').addOptions(options).setMaxValues(1).setMinValues(1),
             menu2 = new StringSelectMenuBuilder().setPlaceholder('Change page').setCustomId('pagMenu2').addOptions(options2).setMaxValues(1).setMinValues(1)
 
-        const allButtons = [startButton.setDisabled(true), backButton.setDisabled(true), forwardButton.setDisabled(false), endButton.setDisabled(false), link]
+        const allButtons = [startButton.setDisabled(true), backButton.setDisabled(true), forwardButton.setDisabled(false), endButton.setDisabled(false)]
 
         let group1 = new ActionRowBuilder().addComponents(menu)
         let group2 = new ActionRowBuilder().addComponents(allButtons)
@@ -132,13 +131,7 @@ module.exports = {
 
         const components = [group2, group1, group3]
 
-        let helpMessage = await interaction.reply({
-            content: `Click on the buttons to change page`,
-            embeds: [em1],
-            components: components,
-        })
-
-        const collector = helpMessage.createMessageComponentCollector((button) => button.user.id === interaction.user.id, { time: 60e3 });
+        // Defer the reply immediately to prevent interaction timeout
 
         var embeds = [em1]
 
@@ -146,12 +139,24 @@ module.exports = {
 
         let currentPage = 0
 
+        let helpMessage = await interaction.editReply({
+            content: `Click on the buttons to change page`,
+            embeds: [em1],
+            components: components,
+        })
+
+        const collector = helpMessage.createMessageComponentCollector((button) => button.user.id === interaction.user.id, { time: 300000 }); // 5 minutes, resets on each interaction
+
         collector.on('collect', async (b) => {
             if (b.user.id !== interaction.user.id)
                 return b.reply({
                     content: `**You Can't Use it\n**`,
                     ephemeral: true
                 });
+            
+            // Reset the collector timer on each interaction
+            collector.resetTimer();
+            
             switch (b.customId) {
                 case 'start':
                     currentPage = 0
@@ -190,8 +195,18 @@ module.exports = {
             }
         });
 
-        collector.on('end', b => {
-            b.update({ embeds: [helpMessage.embeds[0]], content: [], components: [] })
+        collector.on('end', collected => {
+            // When collector ends (timeout after 5 minutes of inactivity), remove all components to prevent interaction failure
+            if (helpMessage && !helpMessage.deleted) {
+                helpMessage.edit({
+                    content: `Help menu expired (5 minutes inactive)`,
+                    embeds: [helpMessage.embeds[0]], 
+                    components: []
+                }).catch(err => {
+                    // If message was deleted or interaction failed, log error but don't crash
+                    console.log('Failed to edit help message after timeout:', err.message);
+                });
+            }
         });
 
         collector.on('error', (e) => console.log(e));

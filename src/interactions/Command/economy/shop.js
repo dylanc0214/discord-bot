@@ -114,7 +114,6 @@ module.exports = {
 
 // Handle viewing the shop
 async function handleView(interaction, client) {
-    await interaction.deferReply();
 
     const category = interaction.options.getString('category') || 'all';
     const sortBy = interaction.options.getString('sort') || 'price_asc';
@@ -236,7 +235,6 @@ async function handleView(interaction, client) {
 
 // Handle buying items
 async function handleBuy(interaction, client) {
-    await interaction.deferReply();
 
     const itemID = interaction.options.getString('item');
     const quantity = interaction.options.getInteger('quantity') || 1;
@@ -405,7 +403,6 @@ async function handleBuy(interaction, client) {
 
 // Handle item info
 async function handleInfo(interaction, client) {
-    await interaction.deferReply();
 
     const itemID = interaction.options.getString('item');
 
@@ -522,7 +519,6 @@ async function handleInfo(interaction, client) {
 
 // Handle shop management
 async function handleManage(interaction, client) {
-    await interaction.deferReply();
 
     const action = interaction.options.getString('action');
     const itemID = interaction.options.getString('item');

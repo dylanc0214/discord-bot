@@ -7,7 +7,7 @@ const giveawayModel = require("../../database/models/giveaways");
 module.exports = (client) => {
     const GiveawayManagerWithOwnDatabase = class extends GiveawaysManager {
         async getAllGiveaways() {
-            return await giveawayModel.find().lean().exec();
+            return await giveawayModel.findAll();
         }
 
         async saveGiveaway(messageId, giveawayData) {
@@ -16,12 +16,12 @@ module.exports = (client) => {
         }
 
         async editGiveaway(messageId, giveawayData) {
-            await giveawayModel.updateOne({ messageId }, giveawayData, { omitUndefined: true }).exec();
+            await giveawayModel.update(giveawayData, { where: { messageId } });
             return true;
         }
 
         async deleteGiveaway(messageId) {
-            await giveawayModel.deleteOne({ messageId }).exec();
+            await giveawayModel.destroy({ where: { messageId } });
             return true;
         }
 

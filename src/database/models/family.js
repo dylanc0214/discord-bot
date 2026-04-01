@@ -1,11 +1,10 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    User: String,
-    Parent: { type: Array, default: null },
-    Partner: { type: String, default: null },
-    Children: { type: Array, default: null },
-});
-
-module.exports = mongoose.model("family", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('Family', {
+    Guild: { type: DataTypes.STRING(32) },
+    User: { type: DataTypes.STRING(32) },
+    Parent: { type: DataTypes.JSON, defaultValue: null },
+    Partner: { type: DataTypes.STRING(32), defaultValue: null },
+    Children: { type: DataTypes.JSON, defaultValue: null },
+}, { tableName: 'family' });
+addMongooseCompat(Model);
+module.exports = Model;

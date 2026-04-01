@@ -1,9 +1,8 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    Role: String,
-    Amount: Number
-});
-
-module.exports = mongoose.model("economyStore", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('EconomyStore', {
+    Guild: { type: DataTypes.STRING(32) },
+    Role: { type: DataTypes.STRING(32) },
+    Amount: { type: DataTypes.BIGINT },
+}, { tableName: 'economy_store' });
+addMongooseCompat(Model);
+module.exports = Model;

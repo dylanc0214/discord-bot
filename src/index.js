@@ -1,7 +1,6 @@
-const app = require("express")();
 const Discord = require('discord.js');
 const chalk = require('chalk');
-require('dotenv').config('./.env');
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const axios = require('axios');
 const webhook = require("./config/webhooks.json");
 const config = require("./config/bot.js");
@@ -19,22 +18,13 @@ console.log(`\u001b[0m`)
 console.log(chalk.blue(chalk.bold(`System`)), (chalk.white(`>>`)), chalk.red(`Version ${require(`${process.cwd()}/package.json`).version}`), (chalk.green(`loaded`)))
 console.log(`\u001b[0m`);
 
-// Main Express app for dashboard
-app.get("/", (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
-    res.send(`<iframe style="margin: 0; padding: 0;" width="100%" height="100%" src="https://uoaio.vercel.app/" frameborder="0" allowfullscreen></iframe>`);
-    res.end()
-});
 
-// Start dashboard server
-const { server: dashboardServer, broadcastToGuild } = require('./dashboard/server');
-app.use('/dashboard', dashboardServer);
 
-// Start API server
-const apiServer = require('./api/server');
-app.use('/api', apiServer);
+// Dashboard server (standalone, uses DASHBOARD_PORT=3010)
+require('./dashboard/server');
 
-app.listen(3000, () => console.log(chalk.blue(chalk.bold(`Server`)), (chalk.white(`>>`)), (chalk.green(`Running on`)), (chalk.red(`3000`))))
+// API server
+try { require('./api/server'); } catch(e) { console.log('API server not loaded:', e.message); }
 
 require('./bot')
 

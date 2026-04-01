@@ -1,24 +1,28 @@
-const mongoose = require('mongoose');
 const chalk = require('chalk');
+// Import the shared Sequelize instance (created in modelHelper.js using env vars)
+const { sequelize } = require('./models/modelHelper');
 
+// Re-export for any other modules that need it
+module.exports.sequelize = sequelize;
+
+// Connect + sync function
 async function connect() {
-  mongoose.set('strictQuery', false);
+    console.log(chalk.blue(chalk.bold(`Database`)), chalk.white(`>>`), chalk.red(`MySQL`), chalk.green(`is connecting...`));
+    try {
+        await sequelize.authenticate();
+        console.log(chalk.blue(chalk.bold(`Database`)), chalk.white(`>>`), chalk.red(`MySQL`), chalk.green(`is ready!`));
 
-  console.log(chalk.blue(chalk.bold(`Database`)), (chalk.white(`>>`)), chalk.red(`MongoDB`), chalk.green(`is connecting...`))
-  await mongoose.connect(process.env.MONGO_TOKEN).then(() => {
-    console.log(chalk.blue(chalk.bold(`Database`)), (chalk.white(`>>`)), chalk.red(`MongoDB`), chalk.green(`is ready!`))
-  }).catch((err) => {
-    console.log(chalk.red(`[ERROR]`), chalk.white(`>>`), chalk.red(`MongoDB`), chalk.white(`>>`), chalk.red(`Failed to connect to MongoDB!`), chalk.white(`>>`), chalk.red(`Error: ${err}`))
-    console.log(chalk.red("Exiting..."))
-    process.exit(1)
-  })
+        // Import all models so Sequelize knows about all tables
+        require('./models');
 
-  mongoose.connection.on("error", (err) => {
-    console.log(chalk.red(`[ERROR]`), chalk.white(`>>`), chalk.red(`Database`), chalk.white(`>>`), chalk.red(`Failed to connect to MongoDB!`), chalk.white(`>>`), chalk.red(`Error: ${err}`))
-    console.log(chalk.red("Exiting..."))
-    process.exit(1)
-  });
-  return;
+        // Sync all tables (creates if not exists, never drops or alters)
+        await sequelize.sync({ force: false, alter: false });
+        console.log(chalk.blue(chalk.bold(`Database`)), chalk.white(`>>`), chalk.red(`MySQL`), chalk.green(`tables synced!`));
+    } catch (err) {
+        console.log(chalk.red(`[ERROR]`), chalk.white(`>>`), chalk.red(`MySQL`), chalk.white(`>>`), chalk.red(`Failed to connect!`), chalk.white(`>>`), chalk.red(`Error: ${err}`));
+        console.log(chalk.red('Exiting...'));
+        process.exit(1);
+    }
 }
 
-module.exports = async () => await new Promise(connect)
+module.exports = async () => await connect();

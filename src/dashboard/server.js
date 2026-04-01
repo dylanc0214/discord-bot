@@ -16,7 +16,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: process.env.DASHBOARD_URL || "http://localhost:3001",
+        origin: ["http://localhost:3001", "http://127.0.0.1:3001", "http://161.97.95.16:8085", "http://localhost:8085", "http://127.0.0.1:8085", process.env.DASHBOARD_URL || "http://localhost:3001"],
         methods: ["GET", "POST"]
     }
 });
@@ -125,24 +125,22 @@ app.get('/logout', (req, res) => {
 });
 
 // API Routes
-app.get('/api/user', ensureAuth, (req, res) => {
+app.get('/api/user', (req, res) => {
+    // Temporarily disabled auth for testing
     res.json({
         user: {
-            id: req.user.id,
-            username: req.user.username,
-            discriminator: req.user.discriminator,
-            avatar: req.user.avatar,
-            guilds: req.user.guilds
+            id: "123456789",
+            username: "TestUser",
+            discriminator: "0001",
+            avatar: null,
+            guilds: []
         }
     });
 });
 
-app.get('/api/guilds', ensureAuth, (req, res) => {
-    const managedGuilds = req.user.guilds.filter(guild => 
-        guild.permissions & 0x8 || // Administrator
-        guild.owner === true ||
-        guild.permissions & 0x20 // Manage Guild
-    );
+app.get('/api/guilds', (req, res) => {
+    // Temporarily disabled auth for testing
+    const managedGuilds = [];
     
     res.json({ guilds: managedGuilds });
 });

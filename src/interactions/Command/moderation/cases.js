@@ -136,7 +136,6 @@ module.exports = {
 
 // Handle viewing a specific case
 async function handleView(interaction, client) {
-    await interaction.deferReply();
 
     const caseID = interaction.options.getInteger('case');
 
@@ -173,7 +172,6 @@ async function handleView(interaction, client) {
 
 // Handle viewing user cases
 async function handleUser(interaction, client) {
-    await interaction.deferReply();
 
     const targetUser = interaction.options.getUser('user');
     const limit = interaction.options.getInteger('limit') || 10;
@@ -236,7 +234,6 @@ async function handleUser(interaction, client) {
 
 // Handle viewing recent cases
 async function handleRecent(interaction, client) {
-    await interaction.deferReply();
 
     const limit = interaction.options.getInteger('limit') || 10;
     const type = interaction.options.getString('type') || 'all';
@@ -296,7 +293,6 @@ async function handleRecent(interaction, client) {
 
 // Handle searching cases
 async function handleSearch(interaction, client) {
-    await interaction.deferReply();
 
     const query = interaction.options.getString('query');
     const limit = interaction.options.getInteger('limit') || 10;
@@ -354,7 +350,6 @@ async function handleSearch(interaction, client) {
 
 // Handle adding notes to cases
 async function handleNote(interaction, client) {
-    await interaction.deferReply();
 
     const caseID = interaction.options.getInteger('case');
     const note = interaction.options.getString('note');
@@ -399,7 +394,6 @@ async function handleNote(interaction, client) {
 
 // Handle editing cases
 async function handleEdit(interaction, client) {
-    await interaction.deferReply();
 
     const caseID = interaction.options.getInteger('case');
     const newReason = interaction.options.getString('reason');
@@ -449,7 +443,6 @@ async function handleEdit(interaction, client) {
 
 // Handle showing statistics
 async function handleStats(interaction, client) {
-    await interaction.deferReply();
 
     try {
         const stats = await ModerationCases.getGuildStats(interaction.guild.id, 30);

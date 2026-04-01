@@ -7,7 +7,6 @@ module.exports = {
         .setDescription('Work to earn money'),
 
     async execute(interaction, client) {
-        await interaction.deferReply();
 
         try {
             // Get or create economy user

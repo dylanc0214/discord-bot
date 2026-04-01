@@ -102,7 +102,6 @@ module.exports = {
 
 // Handle command listing
 async function handleList(interaction, client) {
-    await interaction.deferReply();
 
     const sortBy = interaction.options.getString('sort') || 'name';
     const guild = interaction.guild;
@@ -167,7 +166,6 @@ async function handleList(interaction, client) {
 
 // Handle command editing
 async function handleEdit(interaction, client) {
-    await interaction.deferReply();
 
     const guild = interaction.guild;
     const commandName = interaction.options.getString('name');
@@ -241,7 +239,6 @@ async function handleEdit(interaction, client) {
 
 // Handle command deletion
 async function handleDelete(interaction, client) {
-    await interaction.deferReply();
 
     const guild = interaction.guild;
     const commandName = interaction.options.getString('name');
@@ -302,7 +299,6 @@ async function handleDelete(interaction, client) {
 
 // Handle command info
 async function handleInfo(interaction, client) {
-    await interaction.deferReply();
 
     const guild = interaction.guild;
     const commandName = interaction.options.getString('name');
@@ -375,7 +371,6 @@ async function handleInfo(interaction, client) {
 
 // Handle command toggle
 async function handleToggle(interaction, client) {
-    await interaction.deferReply();
 
     const guild = interaction.guild;
     const commandName = interaction.options.getString('name');

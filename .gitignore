@@ -104,4 +104,6 @@ dist
 .tern-port
 
 # mainly for package-lock.json and pnpm-lock.yml 
-*-lock.* 
+*-lock.* .env.clean
+
+.env.clean

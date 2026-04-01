@@ -1,8 +1,7 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    Channels: Array
-});
-
-module.exports = mongoose.model("channellist", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('ChannelList', {
+    Guild: { type: DataTypes.STRING(32) },
+    Channel: { type: DataTypes.STRING(32) },
+}, { tableName: 'channel_list' });
+addMongooseCompat(Model);
+module.exports = Model;

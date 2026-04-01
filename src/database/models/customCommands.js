@@ -1,122 +1,64 @@
-const mongoose = require('mongoose');
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
 
-const schema = new mongoose.Schema({
-    // Command identification
-    guildID: { type: String, required: true, index: true },
-    commandName: { type: String, required: true, lowercase: true, trim: true },
-    createdBy: { type: String, required: true }, // User ID who created it
-    
-    // Command content
-    response: { type: String, required: true, maxlength: 2000 },
-    description: { type: String, default: 'Custom command', maxlength: 100 },
-    
-    // Command settings
-    enabled: { type: Boolean, default: true },
-    embed: { 
-        type: Boolean, 
-        default: false 
-    },
-    embedColor: { 
-        type: String, 
-        default: '#5865F2',
-        validate: {
-            validator: function(v) {
-                return /^#[0-9A-F]{6}$/i.test(v);
-            },
-            message: 'Embed color must be a valid hex color'
-        }
-    },
-    
-    // Usage tracking
-    uses: { type: Number, default: 0 },
-    lastUsed: { type: Date, default: null },
-    
-    // Permissions
-    allowedRoles: [{ type: String }], // Role IDs that can use this command
-    allowedUsers: [{ type: String }], // User IDs that can use this command
-    deniedRoles: [{ type: String }], // Role IDs denied from using
-    deniedUsers: [{ type: String }], // User IDs denied from using
-    
-    // Cooldowns
-    cooldown: { type: Number, default: 0 }, // Cooldown in seconds
-    lastUsedBy: {}, // Track last usage per user for cooldowns
-    
-    // Metadata
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
-}, { 
-    timestamps: true,
-    // Ensure unique command names per guild
-    index: { guildID: 1, commandName: 1 }, 
-    unique: true 
+const CustomCommands = sequelize.define('CustomCommands', {
+    guildID: { type: DataTypes.STRING(32), allowNull: false },
+    commandName: { type: DataTypes.STRING(100), allowNull: false },
+    createdBy: { type: DataTypes.STRING(32) },
+    response: { type: DataTypes.TEXT },
+    description: { type: DataTypes.STRING(200), defaultValue: 'Custom command' },
+    enabled: { type: DataTypes.BOOLEAN, defaultValue: true },
+    embed: { type: DataTypes.BOOLEAN, defaultValue: false },
+    embedColor: { type: DataTypes.STRING(10), defaultValue: '#5865F2' },
+    uses: { type: DataTypes.INTEGER, defaultValue: 0 },
+    lastUsed: { type: DataTypes.DATE, defaultValue: null },
+    allowedRoles: { type: DataTypes.JSON, defaultValue: [] },
+    allowedUsers: { type: DataTypes.JSON, defaultValue: [] },
+    deniedRoles: { type: DataTypes.JSON, defaultValue: [] },
+    deniedUsers: { type: DataTypes.JSON, defaultValue: [] },
+    cooldown: { type: DataTypes.INTEGER, defaultValue: 0 },
+    lastUsedBy: { type: DataTypes.JSON, defaultValue: {} },
+}, {
+    tableName: 'custom_commands',
+    indexes: [{ unique: true, fields: ['guildID', 'commandName'] }]
 });
 
-// Pre-save middleware to update timestamps
-schema.pre('save', function(next) {
-    this.updatedAt = new Date();
-    next();
-});
+addMongooseCompat(CustomCommands);
 
-// Method to check if user can use this command
-schema.methods.canUse = async function(member) {
-    // Check if command is enabled
+// Instance methods
+CustomCommands.prototype.canUse = async function(member) {
     if (!this.enabled) return { allowed: false, reason: 'Command is disabled' };
-    
-    // Check denied users first (highest priority)
-    if (this.deniedUsers.includes(member.id)) {
-        return { allowed: false, reason: 'You are explicitly denied from using this command' };
-    }
-    
-    // Check denied roles
-    const hasDeniedRole = member.roles.cache.some(role => this.deniedRoles.includes(role.id));
-    if (hasDeniedRole) {
-        return { allowed: false, reason: 'Your role is denied from using this command' };
-    }
-    
-    // If allowed users are set, check if user is in the list
-    if (this.allowedUsers.length > 0 && !this.allowedUsers.includes(member.id)) {
-        return { allowed: false, reason: 'You are not allowed to use this command' };
-    }
-    
-    // If allowed roles are set, check if user has any of them
-    if (this.allowedRoles.length > 0) {
-        const hasAllowedRole = member.roles.cache.some(role => this.allowedRoles.includes(role.id));
-        if (!hasAllowedRole) {
-            return { allowed: false, reason: 'You don\'t have the required role to use this command' };
-        }
-    }
-    
+    const denied = this.deniedUsers || [];
+    const deniedRoles = this.deniedRoles || [];
+    const allowedUsers = this.allowedUsers || [];
+    const allowedRoles = this.allowedRoles || [];
+    if (denied.includes(member.id)) return { allowed: false, reason: 'You are denied from using this command' };
+    if (member.roles.cache.some(r => deniedRoles.includes(r.id))) return { allowed: false, reason: 'Your role is denied' };
+    if (allowedUsers.length > 0 && !allowedUsers.includes(member.id)) return { allowed: false, reason: 'You are not allowed to use this command' };
+    if (allowedRoles.length > 0 && !member.roles.cache.some(r => allowedRoles.includes(r.id))) return { allowed: false, reason: 'You need the required role' };
     return { allowed: true };
 };
 
-// Method to check cooldown
-schema.methods.checkCooldown = function(userId) {
-    if (this.cooldown <= 0) return { canUse: true };
-    
-    const lastUse = this.lastUsedBy[userId];
+CustomCommands.prototype.checkCooldown = function(userId) {
+    if (!this.cooldown || this.cooldown <= 0) return { canUse: true };
+    const lastUsedBy = this.lastUsedBy || {};
+    const lastUse = lastUsedBy[userId];
     if (!lastUse) return { canUse: true };
-    
-    const timeSinceLastUse = Date.now() - lastUse.getTime();
+    const timeSince = Date.now() - new Date(lastUse).getTime();
     const cooldownMs = this.cooldown * 1000;
-    
-    if (timeSinceLastUse < cooldownMs) {
-        const remainingTime = Math.ceil((cooldownMs - timeSinceLastUse) / 1000);
-        return { 
-            canUse: false, 
-            remainingTime,
-            reason: `Please wait ${remainingTime} more seconds before using this command again`
-        };
+    if (timeSince < cooldownMs) {
+        const remaining = Math.ceil((cooldownMs - timeSince) / 1000);
+        return { canUse: false, remainingTime: remaining, reason: `Please wait ${remaining} more seconds` };
     }
-    
     return { canUse: true };
 };
 
-// Method to update usage
-schema.methods.recordUsage = function(userId) {
-    this.uses += 1;
+CustomCommands.prototype.recordUsage = function(userId) {
+    this.uses = (this.uses || 0) + 1;
     this.lastUsed = new Date();
-    this.lastUsedBy[userId] = new Date();
+    const lastUsedBy = this.lastUsedBy || {};
+    lastUsedBy[userId] = new Date();
+    this.lastUsedBy = lastUsedBy;
     return this.save();
 };
 
-module.exports = mongoose.model('CustomCommands', schema);
+module.exports = CustomCommands;

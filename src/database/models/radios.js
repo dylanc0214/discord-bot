@@ -1,9 +1,7 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    Name: String,
-    Url: String
-});
-
-module.exports = mongoose.model("radios", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('Radios', {
+    Guild: { type: DataTypes.STRING(32) },
+    Radio: { type: DataTypes.TEXT },
+}, { tableName: 'radios' });
+addMongooseCompat(Model);
+module.exports = Model;

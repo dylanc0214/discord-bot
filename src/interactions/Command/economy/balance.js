@@ -11,6 +11,7 @@ module.exports = {
                 .setRequired(false)),
 
     async execute(interaction, client) {
+        // Defer immediately for database operations
         await interaction.deferReply();
 
         const targetUser = interaction.options.getUser('user') || interaction.user;

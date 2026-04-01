@@ -1,9 +1,8 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    User: String,
-    Count: Number,
-});
-
-module.exports = mongoose.model("count", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('Count', {
+    Guild: { type: DataTypes.STRING(32) },
+    Channel: { type: DataTypes.STRING(32) },
+    Count: { type: DataTypes.INTEGER, defaultValue: 0 },
+}, { tableName: 'count' });
+addMongooseCompat(Model);
+module.exports = Model;

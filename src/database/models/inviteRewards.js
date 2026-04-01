@@ -1,9 +1,8 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    Invites: Number,
-    Role: String,
-});
-
-module.exports = mongoose.model("inviteRewards", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('InviteRewards', {
+    Guild: { type: DataTypes.STRING(32) },
+    Invites: { type: DataTypes.INTEGER },
+    Role: { type: DataTypes.STRING(32) },
+}, { tableName: 'invite_rewards' });
+addMongooseCompat(Model);
+module.exports = Model;

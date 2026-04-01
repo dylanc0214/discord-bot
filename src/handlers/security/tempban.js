@@ -6,11 +6,11 @@ module.exports = (client) => {
 
         const condition = {
             expires: {
-                $lt: now,
+                [require('sequelize').Op.lt]: now,
             },
         }
 
-        const results = await Schema.find(condition)
+        const results = await Schema.findAll({ where: condition })
 
         if (results) {
             for (const result of results) {
@@ -22,7 +22,7 @@ module.exports = (client) => {
                 }
             }
 
-            await Schema.deleteMany(condition)
+            await Schema.destroy({ where: condition })
         }
 
         setTimeout(checkForExpired, 1000 * 10)

@@ -5,7 +5,7 @@ const birthdayChannel = require("../../database/models/birthdaychannels");
 module.exports = (client) => {
     const checkBirthdays = async () => {
         const now = new Date();
-        const getLastDate = await Devs.findOne({ Action: "Birthday" }).exec();
+        const getLastDate = await Devs.findOne({ where: { Action: "Birthday" } });
 
         let month = now.getMonth() + 1;
         let day = now.getDate();

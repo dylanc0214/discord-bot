@@ -44,7 +44,6 @@ module.exports = {
      */
 
     run: async (client, interaction, args) => {
-        await interaction.deferReply({ fetchReply: true });
         client.loadSubcommands(client, interaction, args);
     },
 };

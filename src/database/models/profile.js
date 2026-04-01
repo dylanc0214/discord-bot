@@ -1,21 +1,20 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    User: String,
-    Gender: { type: String, default: "" },
-    Age: { type: String, default: "" },
-    Orgin: { type: String, default: "" },
-    Pets: Array,
-    Songs: Array,
-    Movies: Array,
-    Actors: Array,
-    Artists: Array,
-    Food: Array,
-    Hobbys: Array,
-    Status: { type: String, default: "" },
-    Aboutme: { type: String, default: "" },
-    Color: { type: String, default: "" },
-    Birthday: { type: String, default: "" },
-});
-
-module.exports = mongoose.model("Profile", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('Profile', {
+    User: { type: DataTypes.STRING(32) },
+    Gender: { type: DataTypes.STRING(20), defaultValue: '' },
+    Age: { type: DataTypes.STRING(10), defaultValue: '' },
+    Orgin: { type: DataTypes.STRING(100), defaultValue: '' },
+    Pets: { type: DataTypes.JSON },
+    Songs: { type: DataTypes.JSON },
+    Movies: { type: DataTypes.JSON },
+    Actors: { type: DataTypes.JSON },
+    Artists: { type: DataTypes.JSON },
+    Food: { type: DataTypes.JSON },
+    Hobbys: { type: DataTypes.JSON },
+    Status: { type: DataTypes.TEXT, defaultValue: '' },
+    Aboutme: { type: DataTypes.TEXT, defaultValue: '' },
+    Color: { type: DataTypes.STRING(20), defaultValue: '' },
+    Birthday: { type: DataTypes.STRING(20), defaultValue: '' },
+}, { tableName: 'profile' });
+addMongooseCompat(Model);
+module.exports = Model;

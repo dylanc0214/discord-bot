@@ -7,7 +7,6 @@ module.exports = {
         .setDescription('Claim your daily reward'),
 
     async execute(interaction, client) {
-        await interaction.deferReply();
 
         try {
             // Get or create economy user

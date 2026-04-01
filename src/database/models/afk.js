@@ -1,9 +1,7 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    User: String,
-    Message: {type: String, default: false}
-});
-
-module.exports = mongoose.model("afk", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('Afk', {
+    User: { type: DataTypes.STRING(32) },
+    Reason: { type: DataTypes.TEXT },
+}, { tableName: 'afk' });
+addMongooseCompat(Model);
+module.exports = Model;

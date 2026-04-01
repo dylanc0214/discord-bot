@@ -137,7 +137,6 @@ module.exports = {
 
 // Handle enabling auto-mod
 async function handleEnable(interaction, client) {
-    await interaction.deferReply();
 
     try {
         const settings = await ModerationSettings.getSettings(interaction.guild.id);
@@ -165,7 +164,6 @@ async function handleEnable(interaction, client) {
 
 // Handle disabling auto-mod
 async function handleDisable(interaction, client) {
-    await interaction.deferReply();
 
     try {
         const settings = await ModerationSettings.getSettings(interaction.guild.id);
@@ -193,7 +191,6 @@ async function handleDisable(interaction, client) {
 
 // Handle adding a new rule
 async function handleAddRule(interaction, client) {
-    await interaction.deferReply();
 
     const name = interaction.options.getString('name');
     const triggerType = interaction.options.getString('trigger-type');
@@ -306,7 +303,6 @@ async function handleAddRule(interaction, client) {
 
 // Handle removing a rule
 async function handleRemoveRule(interaction, client) {
-    await interaction.deferReply();
 
     const ruleName = interaction.options.getString('rule');
 
@@ -348,7 +344,6 @@ async function handleRemoveRule(interaction, client) {
 
 // Handle listing rules
 async function handleList(interaction, client) {
-    await interaction.deferReply();
 
     const filter = interaction.options.getString('filter') || 'all';
 
@@ -409,7 +404,6 @@ async function handleList(interaction, client) {
 
 // Handle toggling a rule
 async function handleToggle(interaction, client) {
-    await interaction.deferReply();
 
     const ruleName = interaction.options.getString('rule');
 
@@ -453,7 +447,6 @@ async function handleToggle(interaction, client) {
 
 // Handle showing statistics
 async function handleStats(interaction, client) {
-    await interaction.deferReply();
 
     try {
         const settings = await ModerationSettings.getSettings(interaction.guild.id);

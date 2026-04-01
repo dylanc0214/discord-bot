@@ -1,10 +1,9 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    User: String,
-    FishingRod: { type: Boolean, default: false },
-    FishingRodUsage: { type: Number, default: 0 },
-});
-
-module.exports = mongoose.model("economyItems", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('EconomyItems', {
+    Guild: { type: DataTypes.STRING(32) },
+    User: { type: DataTypes.STRING(32) },
+    FishingRod: { type: DataTypes.BOOLEAN, defaultValue: false },
+    FishingRodUsage: { type: DataTypes.INTEGER, defaultValue: 0 },
+}, { tableName: 'economy_items_simple' });
+addMongooseCompat(Model);
+module.exports = Model;

@@ -1,11 +1,10 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    userID: { type: String },
-    guildID: { type: String },
-    xp: { type: Number, default: 0 },
-    level: { type: Number, default: 0 },
-    lastUpdated: { type: Date, default: new Date() }
-});
-
-module.exports = mongoose.model("Levels", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('Levels', {
+    userID: { type: DataTypes.STRING(32) },
+    guildID: { type: DataTypes.STRING(32) },
+    xp: { type: DataTypes.BIGINT, defaultValue: 0 },
+    level: { type: DataTypes.INTEGER, defaultValue: 0 },
+    lastUpdated: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+}, { tableName: 'levels' });
+addMongooseCompat(Model);
+module.exports = Model;

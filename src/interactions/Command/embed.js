@@ -21,7 +21,6 @@ module.exports = {
    */
 
   run: async (client, interaction, args) => {
-    await interaction.deferReply({ fetchReply: true });
     const perms = await client.checkPerms(
       {
         flags: [Discord.PermissionsBitField.Flags.ManageMessages],

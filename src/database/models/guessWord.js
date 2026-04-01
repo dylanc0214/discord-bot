@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    Channel: String,
-    Word: { type: String, default: "start" },
-});
-
-module.exports = mongoose.model("guessWord", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('GuessWord', {
+    Guild: { type: DataTypes.STRING(32) },
+    Channel: { type: DataTypes.STRING(32) },
+    Word: { type: DataTypes.STRING(100) },
+    Active: { type: DataTypes.BOOLEAN, defaultValue: false },
+}, { tableName: 'guess_word' });
+addMongooseCompat(Model);
+module.exports = Model;

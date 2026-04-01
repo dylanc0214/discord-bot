@@ -1,10 +1,9 @@
-const mongoose = require('mongoose');
-
-const Schema = new mongoose.Schema({
-    Guild: String,
-    Name: String,
-    Responce: String,
-    Action: { type: String, default: "Normal" },
-});
-
-module.exports = mongoose.model("customCommandsAdvanced", Schema);
+const { sequelize, DataTypes, addMongooseCompat } = require('./modelHelper');
+const Model = sequelize.define('CustomCommandAdvanced', {
+    Guild: { type: DataTypes.STRING(32) },
+    Name: { type: DataTypes.STRING(100) },
+    Responce: { type: DataTypes.TEXT },
+    Action: { type: DataTypes.STRING(50), defaultValue: 'Normal' },
+}, { tableName: 'custom_command_advanced' });
+addMongooseCompat(Model);
+module.exports = Model;

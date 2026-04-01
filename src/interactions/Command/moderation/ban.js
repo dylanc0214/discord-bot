@@ -47,7 +47,6 @@ module.exports = {
                 .setRequired(false)),
 
     async execute(interaction, client) {
-        await interaction.deferReply();
 
         const guild = interaction.guild;
         const moderator = interaction.member;

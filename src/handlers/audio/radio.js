@@ -77,20 +77,19 @@ module.exports = (client) => {
     client.on(Discord.Events.ClientReady, async () => {
        client.startStream(process.env.RADIO ??  radio)
         
-        Schema.find(async (err, data) => {
-            if (data) {
-                for (var i = 0; i < data.length; i++) {
-                    try {
-                        const channel = await client.channels.fetch(data[i].Channel)
+        const data = await Schema.findAll();
+        if (data) {
+            for (var i = 0; i < data.length; i++) {
+                try {
+                    const channel = await client.channels.fetch(data[i].Channel);
 
-                        if (channel) {
-                            client.radioStart(channel);
-                        }
+                    if (channel) {
+                        client.radioStart(channel);
                     }
-                    catch { }
                 }
+                catch { }
             }
-        })
+        }
     });
 }
 

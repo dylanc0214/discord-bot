@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const Captcha = require("@haileybot/captcha-generator");
+// const Captcha = require("@haileybot/captcha-generator");
 
 const reactionSchema = require("../../database/models/reactionRoles");
 const banSchema = require("../../database/models/userBans");
@@ -9,77 +9,96 @@ const CommandsSchema = require("../../database/models/customCommandAdvanced");
 module.exports = async (client, interaction) => {
     // Commands
     if (interaction.isCommand() || interaction.isUserContextMenuCommand()) {
-        banSchema.findOne({ User: interaction.user.id }, async (err, data) => {
-            if (data) {
+        try {
+            const banData = await banSchema.findOne({ where: { User: interaction.user.id } });
+            if (banData) {
                 return client.errNormal({
                     error: "You have been banned by the developers of this bot",
                     type: 'ephemeral'
                 }, interaction);
             }
-            else {
-                const cmd = client.commands.get(interaction.commandName);
-                if (!cmd) {
-                    const cmdd = await Commands.findOne({
+            
+            const cmd = client.commands.get(interaction.commandName);
+            if (!cmd) {
+                const cmdd = await Commands.findOne({
+                    where: {
                         Guild: interaction.guild.id,
                         Name: interaction.commandName,
-                    });
-                    if (cmdd) {
-                        return interaction.channel.send({ content: cmdd.Responce });
                     }
+                });
+                if (cmdd) {
+                    return interaction.channel.send({ content: cmdd.Responce });
+                }
 
-                    const cmdx = await CommandsSchema.findOne({
+                const cmdx = await CommandsSchema.findOne({
+                    where: {
                         Guild: interaction.guild.id,
                         Name: interaction.commandName,
-                    });
-                    if (cmdx) {
-                        // Remove interaction
-                        if (cmdx.Action == "Normal") {
-                            return interaction.reply({ content: cmdx.Responce });
-                        } else if (cmdx.Action == "Embed") {
-                            return client.simpleEmbed(
+                    }
+                });
+                if (cmdx) {
+                    // Remove interaction
+                    if (cmdx.Action == "Normal") {
+                        return interaction.reply({ content: cmdx.Responce });
+                    } else if (cmdx.Action == "Embed") {
+                        return client.simpleEmbed(
+                            {
+                                desc: `${cmdx.Responce}`,
+                                type: 'reply'
+                            },
+                            interaction,
+                        );
+                    } else if (cmdx.Action == "DM") {
+                        await interaction.deferReply({ ephemeral: true });
+                        interaction.editReply({ content: "I have sent you something in your DMs" });
+                        return interaction.user.send({ content: cmdx.Responce }).catch((e) => {
+                            client.errNormal(
                                 {
-                                    desc: `${cmdx.Responce}`,
-                                    type: 'reply'
+                                    error: "I can't DM you, maybe you have DM turned off!",
+                                    type: 'ephemeral'
                                 },
                                 interaction,
                             );
-                        } else if (cmdx.Action == "DM") {
-                            await interaction.deferReply({ ephemeral: true });
-                            interaction.editReply({ content: "I have sent you something in your DMs" });
-                            return interaction.user.send({ content: cmdx.Responce }).catch((e) => {
-                                client.errNormal(
-                                    {
-                                        error: "I can't DM you, maybe you have DM turned off!",
-                                        type: 'ephemeral'
-                                    },
-                                    interaction,
-                                );
-                            });
-                        }
+                        });
                     }
                 }
-                if (interaction.options._subcommand !== null && interaction.options.getSubcommand() == "help") {
-                    const cmdInfo = interaction.client.getSlashMentions(interaction.commandName)
-
-                    return client.embed({
-                        title: `❓・Help panel`,
-                        desc: `Get help with the commands in \`${interaction.commandName}\` \n\n${cmdInfo.map((info) /* array of [cmd_mention, description] */=> `${info[0]} - \`${info[1]}\``).join("\n")}`,
-                        type: 'reply'
-                    }, interaction)
-                }
-
-                if (cmd) cmd.run(client, interaction, interaction.options._hoistedOptions).catch(err => {
-                    client.emit("errorCreate", err, interaction.commandName, interaction)
-                })
             }
-        })
+            
+            if (interaction.options._subcommand !== null && interaction.options.getSubcommand() == "help" && interaction.commandName !== "help") {
+                const cmdInfo = interaction.client.getSlashMentions(interaction.commandName)
+
+                return client.embed({
+                    title: `❓・Help panel`,
+                    desc: `Get help with the commands in \`${interaction.commandName}\` \n\n${cmdInfo.map((info) /* array of [cmd_mention, description] */=> `${info[0]} - \`${info[1]}\``).join("\n")}`,
+                    type: 'reply'
+                }, interaction)
+            }
+
+            if (cmd) cmd.run(client, interaction, interaction.options._hoistedOptions).catch(err => {
+                client.emit("errorCreate", err, interaction.commandName, interaction)
+            })
+        } catch (error) {
+            console.error('Command execution error:', error);
+            client.errNormal({
+                error: "An error occurred while executing this command",
+                type: 'ephemeral'
+            }, interaction);
+        }
     }
 
     // Verify system
     if (interaction.isButton() && interaction.customId == "Bot_verify") {
-        const data = await verify.findOne({ Guild: interaction.guild.id, Channel: interaction.channel.id });
+        const data = await verify.findOne({ 
+            where: { Guild: interaction.guild.id, Channel: interaction.channel.id } 
+        });
         if (data) {
-            let captcha = new Captcha();
+            // Temporarily disabled captcha due to canvas compilation issues
+            client.errNormal({
+                error: "Captcha verification is temporarily disabled. Please contact an admin for manual verification.",
+                type: 'ephemeral'
+            }, interaction);
+            
+            /* let captcha = new Captcha();
 
             try {
                 var image = new Discord.AttachmentBuilder(captcha.JPEGStream, { name: "captcha.jpeg" });
@@ -117,7 +136,7 @@ module.exports = async (client, interaction) => {
             }
             catch (error) {
                 console.log(error)
-            }
+            } */
         }
         else {
             client.errNormal({
@@ -132,7 +151,8 @@ module.exports = async (client, interaction) => {
         var buttonID = interaction.customId.split("-");
 
         if (buttonID[0] == "reaction_button") {
-            reactionSchema.findOne({ Message: interaction.message.id }, async (err, data) => {
+            try {
+                const data = await reactionSchema.findOne({ where: { Message: interaction.message.id } });
                 if (!data) return;
 
                 const [roleid] = data.Roles[buttonID[1]];
@@ -147,46 +167,50 @@ module.exports = async (client, interaction) => {
 
                     interaction.reply({ content: `<@&${roleid}> was added!`, ephemeral: true });
                 }
-            })
+            } catch (error) {
+                console.error('Reaction role button error:', error);
+            }
         }
     }
 
     // Reaction roles select
     if (interaction.isStringSelectMenu()) {
         if (interaction.customId == "reaction_select") {
-            reactionSchema.findOne(
-                { Message: interaction.message.id },
-                async (err, data) => {
-                    if (!data) return;
+            try {
+                const data = await reactionSchema.findOne({ 
+                    where: { Message: interaction.message.id } 
+                });
+                if (!data) return;
 
-                    let roles = "";
+                let roles = "";
 
-                    for (let i = 0; i < interaction.values.length; i++) {
-                        const [roleid] = data.Roles[interaction.values[i]];
+                for (let i = 0; i < interaction.values.length; i++) {
+                    const [roleid] = data.Roles[interaction.values[i]];
 
-                        roles += `<@&${roleid}> `;
+                    roles += `<@&${roleid}> `;
 
-                        if (interaction.member.roles.cache.get(roleid)) {
-                            interaction.guild.members.cache
-                                .get(interaction.user.id)
-                                .roles.remove(roleid)
-                                .catch((error) => { });
-                        } else {
-                            interaction.guild.members.cache
-                                .get(interaction.user.id)
-                                .roles.add(roleid)
-                                .catch((error) => { });
-                        }
+                    if (interaction.member.roles.cache.get(roleid)) {
+                        interaction.guild.members.cache
+                            .get(interaction.user.id)
+                            .roles.remove(roleid)
+                            .catch((error) => { });
+                    } else {
+                        interaction.guild.members.cache
+                            .get(interaction.user.id)
+                            .roles.add(roleid)
+                            .catch((error) => { });
+                    }
 
-                        if ((i + 1) === interaction.values.length) {
-                            interaction.reply({
-                                content: `I have updated the following roles for you: ${roles}`,
-                                ephemeral: true,
-                            });
-                        }
+                    if ((i + 1) === interaction.values.length) {
+                        interaction.reply({
+                            content: `I have updated the following roles for you: ${roles}`,
+                            ephemeral: true,
+                        });
                     }
                 }
-            );
+            } catch (error) {
+                console.error('Reaction role select error:', error);
+            }
         }
     }
     // Tickets
